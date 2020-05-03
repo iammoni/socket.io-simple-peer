@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Click the button to make a BUTTON element with text.</p>
+
+<button onclick="myDiv()">Try it</button>
+
+      <div id="abc">Me hu Me
+      
+      </div>
+
+<script>
+function myDiv() {
+  var div = document.createElement("Div");
+  div.innerHTML = "This is a paragraph.";
+  div.style.margin.top="35px";
+  div.style.width="400px";
+  div.setAttribute('class', 'card');
+  var video = document.createElement("video");
+  video.id="user1";
+  video.style.width="100%";
+  var hr = document.createElement("hr");
+  hr.style.border.width="0px";
+  hr.style.height="2px";
+  hr.style.color="grey";
+  hr.style.background.color="gray";
+  div.appendChild(video);
+  div.appendChild(hr);
+  var div1 = document.createElement("Div");
+  div1.setAttribute('class', 'card-body');
+  var h= document.createElement("h4");
+  var pa = document.createElement("p");
+  h.setAttribute('class', 'card-title');
+  pa.setAttribute('class', 'card-text');
+  h.innerHTML ="Shubham Dhanda"; 
+  pa.innerHTML="Video Chat with some Friends";
+  div1.appendChild(h);
+  div1.appendChild(pa);
+  div.appendChild(div1);
+  document.getElementById("abc").appendChild(div);
+}
+</script>
+
+</body>
+</html>

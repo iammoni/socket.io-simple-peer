@@ -1,0 +1,44 @@
+What are WebSockets?
+WebSockets enable developers to push data between devices in real time without the need to store any data. WebSockets require a server that can send and receive data in form of messages, files, images, etc.
+
+////
+This is one way to run multiple script at a time:
+ "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js",
+    "watch": "watchify ./public/main.js -o ./public/bundle.js -v",
+    "dev":"start npm run watch && start npm run start"
+  },
+
+Add this to script:
+"dev":"start npm run watch && start npm run start"
+npm run dev
+
+This is goona open difernet cmd in window for both to supervise
+or
+run directly in command line:
+For this you have to :npm i -g concurrently
+C:\Users\DHANDA\Desktop\nodeexample> concurrently "npm run watch" "npm run start"
+or
+Their is another way to do that:
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js",
+    "watch": "watchify ./public/main.js -o ./public/bundle.js -v",
+    "dev":"concurrently \"npm run watch\" \"npm run start\""
+  },
+Here we just update dev(we can change dev)
+Now run :npm run dev
+
+What we:1)client side javaScript does not accept require they are only accepted by Nodejs envirement files.
+sol:)Aolution are watchify and browserfy better one is watchify because it automatically update 
+to use anybody npm i -g watchify/browserfy
+and add in package.json under script:
+"watch":"watchify ./public/filenamejiska bundlebanana ha  -o ./public/bundle.js"
+now add this bundle.js in your html file no need to add jisme code likha you just gonna write in jismecode likha file auto mataically wo us bundle me dal dega.
+
+////
+Another thing i have learn:
+console.log() ki output:
+if it in clientside javascript that will be shown in browser console not in teminal
+if it nodej envirement that will be shon in terminal

@@ -1,0 +1,16 @@
+.container{
+    height: 150;
+    width: 150;
+    background-color:blueviolet;
+    padding: 15;
+    margin: 15;
+}
+#client{
+    height: 100;
+    width: 100;
+}
+
+.card{
+    height: 200;
+}
+

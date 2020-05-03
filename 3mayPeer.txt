@@ -1,0 +1,337 @@
+//main.js
+const Peer=require('simple-peer');
+const socket=io();
+var client={};
+var peerdata={};
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>{
+myDiv(stream);
+socket.emit("NewClient");
+
+socket.on("client1",()=>{        
+    console.log("ENter clien 1")
+    
+    peerdata.id=1;
+    var peer1=new Peer({initiator:true,stream:stream,trickle:false});
+    var peer2=new Peer({initiator:true,stream:stream,trickle:false});
+     peer1.on('stream',(stream)=>{
+         myDiv(stream);
+     });
+     peer2.on('stream',(stream)=>{
+        myDiv(stream);
+    });
+   
+    peer1.on('signal', data => {
+        console.log(data);
+        peerdata.idi1=data;
+        client.peer1=peer1;
+        emitdata1();
+    });
+
+    peer2.on('signal', data => {
+        peerdata.idi2=data;
+        client.peer2=peer2;
+        console.log(data);
+        emitdata1();
+    })
+
+ });//End of Client1
+ 
+function emitdata1(){
+    console.log("Enter into emitdata1");
+    if(peerdata.id && peerdata.idi1 && peerdata.idi2){ 
+        console.log("Enter inito if");
+        console.log(peerdata);
+       socket.emit("peer1",peerdata);
+    }
+}
+
+socket.on("client2",()=>{        
+    console.log("ENter clien 2")
+    
+    peerdata.id=2;
+    var peer2=new Peer({initiator:true,stream:stream,trickle:false});
+    var peer1=new Peer({initiator:true,stream:stream,trickle:false});
+    
+     peer1.on('stream',(stream)=>{
+         myDiv(stream);
+     });
+     peer2.on('stream',(stream)=>{
+        myDiv(stream);
+    });
+
+    peer2.on('signal', data => {
+        peerdata.idi1=data;
+        client.peer2=peer2;
+        console.log("peer2"+data);
+        emitdata2();
+    })
+   
+    peer1.on('signal', data => {
+        peerdata.idr1=data;
+        client.peer1=peer1;
+        console.log("Peer1:"+data);
+        emitdata2();
+    })
+
+
+ });//End of Client2
+ 
+function emitdata2(){
+    console.log("Enter into emitdata2");
+    if(peerdata.id && peerdata.idr1 && peerdata.idi1){ 
+        console.log("Enter inito if");
+        console.log(peerdata);
+        socket.emit("peer2",peerdata);
+    }
+}
+
+
+
+socket.on("client3",()=>{        
+    console.log("ENter client 3")
+    
+    peerdata.id=3;
+    var peer1=new Peer({initiator:true,stream:stream,trickle:true});
+    var peer2=new Peer({initiator:true,stream:stream,trickle:true});
+     peer1.on('stream',(stream)=>{
+         myDiv(stream);
+     });
+     peer2.on('stream',(stream)=>{
+        myDiv(stream);
+    });
+   
+    peer1.on('signal', data => {
+        peerdata.idr1=data;
+        console.log("Perr1"+data);
+        client.peer1=peer1;
+        emitdata3();
+    })
+
+    peer2.on('signal', data => {
+        peerdata.idr2=data;
+        client.peer2=peer2;
+        console.log("Peer2"+data);
+        emitdata3();
+    })
+
+     
+    
+
+ });//End of Client3
+ 
+function emitdata3(){
+    console.log("Enter into emitdata3");
+    if(peerdata.id && peerdata.idr1 && peerdata.idr2){ 
+        console.log("Enter inito if");
+        console.log(peerdata);
+       socket.emit("peer3",peerdata);
+    }
+}
+
+ socket.on('backclient1',data=>{
+    console.log("BackClient1"+data);
+  });
+  
+  socket.on('backclient2',data=>{
+    console.log("BacClient2"+data);
+  });
+
+  socket.on('backclient3',data=>{
+    console.log('BackClient3'+data);
+  });
+
+})
+.catch(err=>document.write(err));
+               
+
+function myDiv(stream) {
+  var div = document.createElement("Div");
+//   var nam=document.getElementById('name');
+//   nam.innerHTML="Bala JI";
+  //div.innerHTML = "Peer";
+  div.style.margin.top="50px";
+  div.style.width="400px";
+  div.setAttribute('class', 'card');
+  var video = document.createElement("video");
+  video.id="user2";
+  video.style.width="100%";
+  video.srcObject=stream;
+  video.play();
+  var hr = document.createElement("hr");
+  hr.style.border.width="0px";
+  hr.style.height="2px";
+  hr.style.color="grey";
+  hr.style.background.color="gray";
+  div.appendChild(video);
+  div.appendChild(hr);
+  var div1 = document.createElement("Div");
+  div1.setAttribute('class', 'card-body');
+  var h= document.createElement("h4");
+  var pa = document.createElement("p");
+  h.setAttribute('class', 'card-title');
+  pa.setAttribute('class', 'card-text');
+  h.id="namePeer";
+  h.innerHTML ="It's Oggy"; 
+  pa.innerHTML="    My Friend      ";
+  div1.appendChild(h);
+  div1.appendChild(pa);
+  div.appendChild(div1);
+  document.getElementById("abc").appendChild(div);
+}
+
+
+/////server.js
+
+
+const express = require('express')
+const app = express()
+// const http = require('http').Server(app)
+const socket = require('socket.io');
+const port = process.env.PORT || 8080;
+
+app.use(express.static(__dirname + "/public"));
+var server=app.listen(port,()=>console.log(`Server is running at port:${port}`));
+var io=socket(server);
+
+let clients = 0;
+var arr=[];
+var ob1=null
+var ob2=null
+var ob3=null
+var peer1data,peer2data;
+io.on('connection',(socket)=>{
+
+    socket.on("NewClient",()=>{
+
+        arr.push(socket.id);
+    console.log(arr.length);
+    if(arr.length==3){
+        io.to(arr[0]).emit("client1");
+        io.to(arr[1]).emit("client2");
+        io.to(arr[2]).emit("client3");
+    }
+    })//
+    
+    
+    socket.on("peer1",data=>{
+        console.log("peer1: "+data);
+        ob1=data;
+        checkObj();
+    });
+
+    socket.on("peer2",data=>{
+        console.log("peer2: "+data); 
+        ob2=data;
+        checkObj();
+
+    });
+
+    socket.on("peer3",data=>{
+        console.log("peer3: "+data);
+        ob3=data;
+        checkObj();
+    });
+
+   function checkObj() {
+       if( ob3 && ob2 && ob1){
+    io.to(arr[0]).emit('backclient1',{
+      "id1":ob2.idr1,
+      "id2":ob3.idr1
+    });
+
+    io.to(arr[1]).emit('backclient2',{
+        "id1":ob1.idi1,
+        "id2":ob3.idr2 
+      });
+
+      io.to(arr[2]).emit('backclient3',{
+        "id1":ob1.idi2,
+        "id2":ob2.idi1 
+      });
+    }
+    }
+    
+    
+    socket.on('disconnect',Disconnect);
+
+});
+
+// function printarr(arr){
+//     for (let index = 0; index < arr.length; index++) {
+//         const element = arr[index];
+//         console.log(element);
+//     }
+// }
+
+function Disconnect(){
+
+    const index = arr.indexOf(this.id);
+    if (index > -1) {
+    arr.splice(index, 1);
+     } 
+     console.log("User Disconnected");
+    // printarr(arr.length);
+    console.log(arr.length);
+     //this.broadcast.emit("disconnect");
+     //clients--;
+
+}
+
+
+/////index.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='style.css'>
+    
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src='bundle.js'></script>
+</head>
+<body>
+    
+    <div class="container-fluid">
+        <div class="card-columns" id="abc">
+          
+          
+          /*-+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title">Shubham Dhanda</h4>
+                  <p class="card-text">Video Chat with some Friends</p>
+                </div>
+              </div>  
+
+              <div class="card" style="width:400px;margin-top:35px;">
+                <video  id="user3" style="width:100%">
+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title">Shubham Dhanda</h4>
+                  <p class="card-text">Video Chat with some Friends</p>
+                </div>
+              </div>   -->
+    </div>
+    </div>
+    
+
+    =-098U7Y6T5R4EW A/body>-*/
+</html>
+

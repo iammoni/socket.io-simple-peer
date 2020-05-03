@@ -1,0 +1,256 @@
+server.js
+
+//
+
+
+
+const express = require('express')
+const app = express()
+// const http = require('http').Server(app)
+const socket = require('socket.io');
+const port = process.env.PORT || 8080;
+
+app.use(express.static(__dirname + "/public"));
+var server=app.listen(port,()=>console.log(`Server is running at port:${port}`));
+var io=socket(server);
+
+let clients = 0;
+var arr=[];
+var ob1=null
+var ob2=null
+var ob3=null
+var peer1data,peer2data;
+io.on('connection',(socket)=>{
+    arr.push(socket.id);
+    console.log(arr.length);
+    if(arr.length==3){
+        io.to(arr[0]).emit("client1");
+        io.to(arr[1]).emit("client2");
+        io.to(arr[2]).emit("client3");
+    }
+    
+    socket.on("peer1",data=>{
+        console.log(data);
+        ob1=data;
+        checkObj();
+    });
+
+    socket.on("peer2",data=>{
+        console.log(data); 
+        ob2=data;
+        checkObj();
+
+    });
+
+    socket.on("peer3",data=>{
+        console.log(data);
+        ob3=data;
+        checkObj();
+    });
+
+   function checkObj() {
+       if( ob3 && ob2 && ob1){
+    io.to(arr[0]).emit('backclient1',{
+      "id1":ob2.idr1,
+      "id2":ob3.idr1
+    });
+
+    io.to(arr[1]).emit('backclient2',{
+        "id1":ob1.idi1,
+        "id2":ob3.idr2 
+      });
+
+      io.to(arr[2]).emit('backclient3',{
+        "id1":ob1.idi2,
+        "id2":ob2.idi1 
+      });
+    }
+    }
+    
+    
+    socket.on('disconnect',Disconnect);
+
+});
+
+// function printarr(arr){
+//     for (let index = 0; index < arr.length; index++) {
+//         const element = arr[index];
+//         console.log(element);
+//     }
+// }
+
+function Disconnect(){
+
+    const index = arr.indexOf(this.id);
+    if (index > -1) {
+    arr.splice(index, 1);
+     } 
+     console.log("User Disconnected");
+    // printarr(arr.length);
+    console.log(arr.length);
+     //this.broadcast.emit("disconnect");
+     //clients--;
+
+}
+
+// const express=require('express');
+// const  app=express();
+// const socket=require('socket.io');
+// const port=process.env.PORT||8080;
+// app.use(express.static(__dirname+'/public'));
+
+// var server=app.listen(port,()=>console.log(`Server is running at port:${port}`));
+
+// const io=socket(server);
+// var arr=[];
+// var clients=0;
+
+// io.on('connection',(socket)=>{
+
+//     socket.on("NewClient",Decision);
+
+//     socket.on('request',requestReply);
+//     socket.on('response',response);
+//     socket.on('disconnect',Disconnect);
+
+
+
+// });
+
+// function Decision(socket){
+//     clients++;
+//     console.log("New User Connected: "+clients);
+
+//     console.log("Create: "+this.id);
+//     arr.push(this.id)
+//     if(clients==2){
+//         this.emit('createinitPeer');
+//     }
+// }
+ 
+// function requestReply(data){
+//     this.broadcast.emit('requestreply',data);
+// }
+
+
+// function response(data){
+//  this.broadcast.emit('answer',data);
+// }
+
+
+///html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='style.css'>
+    
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src='bundle.js'></script> -->
+</head>
+<body>
+    
+    <div class="container-fluid">
+        <div class="card-columns" id="abc">
+          <h4 id="hi">Hey! Bala JI</h4>
+            <!-- <div class="card" style="width:400px;margin-top:35px;">
+                <video  id="user1" style="width:100%">
+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title" id="name">Shubham Dhanda</h4>
+                  <p class="card-text">It's Me</p>
+                </div>
+              </div>  
+              <div class="card" style="width:400px;margin-top:35px;">
+                <video  id="user2" style="width:100%">
+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title" id="name">Shubham Dhanda</h4>
+                  <p class="card-text">It's Me</p>
+                </div>
+              </div>   -->
+          
+<!--               
+              <div class="card" style="width:400px;margin-top:35px;">
+                <video id="user2"  style="width:100%">
+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title">Shubham Dhanda</h4>
+                  <p class="card-text">Video Chat with some Friends</p>
+                </div>
+              </div>  
+
+              <div class="card" style="width:400px;margin-top:35px;">
+                <video  id="user3" style="width:100%">
+                
+                </video>
+                <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+                <div class="card-body">
+                  <h4 class="card-title">Shubham Dhanda</h4>
+                  <p class="card-text">Video Chat with some Friends</p>
+                </div>
+              </div>   -->
+    </div>
+    </div>
+    <script>
+      const socket=io();
+      socket.on("client1",()=>{        
+       socket.emit("peer1",{
+         "id":1,
+         "idi1":"9991272800",
+          "idi2":"peer1"
+       })
+      });
+
+      socket.on("client2",()=>{
+        socket.emit("peer2",{
+          "id":2,
+          "idr1":"98135339008",
+          "idi1":"peer2"
+        })
+      })
+      socket.on("client3",()=>{
+        socket.emit("peer3",{
+          "id":3,
+          "idr1":"9991415108",
+          "idr2":"peer3"
+        })
+      });
+
+      socket.on('backclient1',data=>{
+        console.log(data);
+      });
+      
+      socket.on('backclient2',data=>{
+        console.log(data);
+      });
+
+      socket.on('backclient3',data=>{
+        console.log(data);
+      });
+      
+
+
+    </script>
+</body>
+</html>
