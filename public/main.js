@@ -10,7 +10,7 @@ socket.on('broadcast',(data)=>{
     totalClients=data.description;
     console.log( "Fin:"+totalClients);
 });
-navigator.mediaDevices.getUserMedia({video:true,audio:false})
+navigator.mediaDevices.getUserMedia({video:true,audio:true})
 .then(stream=>{
 
     var videouser1=document.getElementById('user1');
