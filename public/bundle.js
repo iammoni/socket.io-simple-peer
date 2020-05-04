@@ -8179,7 +8179,7 @@ socket.on('broadcast',(data)=>{
     totalClients=data.description;
     console.log( "Fin:"+totalClients);
 });
-navigator.mediaDevices.getUserMedia({video:true,audio:false})
+navigator.mediaDevices.getUserMedia({video:true,audio:true})
 .then(stream=>{
 
     var videouser1=document.getElementById('user1');
@@ -8241,7 +8241,7 @@ navigator.mediaDevices.getUserMedia({video:true,audio:false})
         }
 
         function SessionActive() {
-            document.write('Session Active. Please come back later')
+            document.write('Your friend is busy with sombody else. Please come Back later')
         }
 
         function RemovePeer() {
@@ -8258,7 +8258,7 @@ navigator.mediaDevices.getUserMedia({video:true,audio:false})
         socket.on('Answer', SignalAnswer)
         socket.on('SessionActive', SessionActive)
         socket.on('Client2', MakePeer)
-        socket.on('Disconnect', RemovePeer)
+        socket.on('Disconnect', RemovePeer);
         
         console.log(client);
     
